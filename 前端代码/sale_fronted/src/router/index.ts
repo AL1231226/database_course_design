@@ -4,6 +4,10 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
+      path: '/',
+      redirect: '/customer'
+    },
+    {
       path: '/hello',
       name: 'hello',
       component: () => import('../customer/hello.vue')
@@ -11,8 +15,18 @@ const router = createRouter({
     {
       path: '/customer',
       component: () => import('../customer/CustomerLayout.vue'),
+      redirect: '/customer/products',
       children: [
-        // 子路由：products, cart, orders 等
+        {
+          path: 'products',
+          name: 'customer-products',
+          component: () => import('../customer/ProductList.vue')
+        },
+        {
+          path: 'cart',
+          name: 'customer-cart',
+          component: () => import('../customer/ShoppingCart.vue')
+        },
       ]
     }
   ]

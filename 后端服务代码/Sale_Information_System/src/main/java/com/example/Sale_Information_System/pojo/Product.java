@@ -15,7 +15,9 @@ public class Product {
     private Double unitPrice; //单价
     private Integer stockQuantity; //库存数量
 
-    private String manufacturerName; // 关联查询
+    private String manufacturerName;// 关联查询
+
+
 
 
 }

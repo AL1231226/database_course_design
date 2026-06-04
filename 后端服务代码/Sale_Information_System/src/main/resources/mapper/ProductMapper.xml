@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.Sale_Information_System.Mapper.ProductMapper">
+
+
+    <resultMap id="BaseResultMap" type="Product">
+        <id column="product_id" property="productId"/>
+        <result column="category_code" property="categoryCode"/>
+        <result column="manufacturer_code" property="manufacturerCode"/>
+        <result column="description" property="description"/>
+        <result column="unit_price" property="unitPrice"/>
+        <result column="stock_quantity" property="stockQuantity"/>
+        <result column="manufacturer_name" property="manufacturerName"/>
+    </resultMap>
+
+    <select id="getAllProducts" resultMap="BaseResultMap">
+        SELECT p.*, m.manufacturer_name
+        FROM product p
+        LEFT JOIN manufacturer m ON p.manufacturer_code = m.manufacturer_code
+    </select>
+
+
+    <select id="getProductById" resultMap="BaseResultMap">
+        SELECT p.*, m.manufacturer_name
+        FROM product p
+        LEFT JOIN manufacturer m ON p.manufacturer_code = m.manufacturer_code
+        WHERE p.product_id = #{productId}
+    </select>
+
+</mapper>

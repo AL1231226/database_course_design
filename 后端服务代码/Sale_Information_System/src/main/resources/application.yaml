@@ -3,12 +3,12 @@ spring:
     name: Sale_Information_System
   # 数据库配置
   datasource:
-    url: jdbc:mysql://localhost:3306/user_db?useSSL=false&serverTimezone=UTC&characterEncoding=utf-8
+    url: jdbc:mysql://localhost:3306/sales_information_system?useSSL=false&serverTimezone=UTC&characterEncoding=utf-8
     username: root
     password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
 
 # MyBatis 配置
 mybatis:
-  type-aliases-package: com.example.program.pojo
+  type-aliases-package: com.example.Sale_Information_System.pojo
   mapper-locations: classpath:mapper/*.xml
