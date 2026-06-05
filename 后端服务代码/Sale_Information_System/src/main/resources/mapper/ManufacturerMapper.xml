@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.Sale_Information_System.Mapper.ManufacturerMapper">
+
+
+
+    <resultMap id="BaseResultMap" type="Manufacturer">
+        <id column="manufacturer_code" property="manufacturerCode"/>
+        <result column="manufacturer_name" property="manufacturerName"/>
+        <result column="contact_person" property="contactPerson"/>
+        <result column="contact_phone" property="contactPhone"/>
+        <result column="address" property="address"/>
+    </resultMap>
+    <select id="getAllManufacturers" resultMap="BaseResultMap">
+        SELECT * FROM manufacturer
+    </select>
+    <select id="getManufacturerById" resultMap="BaseResultMap">
+        SELECT * FROM manufacturer WHERE manufacturer_code = #{manufacturerCode}
+    </select>
+    <insert id="insert">
+        INSERT INTO manufacturer (manufacturer_code, manufacturer_name, contact_person, contact_phone, address)
+        VALUES (#{manufacturerCode}, #{manufacturerName}, #{contactPerson}, #{contactPhone}, #{address})
+    </insert>
+    <update id="update">
+        UPDATE manufacturer
+        SET manufacturer_name = #{manufacturerName}, contact_person = #{contactPerson}, contact_phone = #{contactPhone}, address = #{address}
+        WHERE manufacturer_code = #{manufacturerCode}
+    </update>
+    <delete id="delete">
+        DELETE FROM manufacturer WHERE manufacturer_code = #{manufacturerCode}
+    </delete>
+</mapper>

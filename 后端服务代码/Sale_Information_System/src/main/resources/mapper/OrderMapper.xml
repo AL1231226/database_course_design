@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.Sale_Information_System.Mapper.OrderMapper">
+    <resultMap id="BaseResultMap" type="com.example.Sale_Information_System.pojo.Orders">
+        <id column="order_id" property="orderId"/>
+        <result column="order_date" property="orderDate"/>
+        <result column="customer_id" property="customerId"/>
+        <result column="shipping_requirements" property="shippingRequirements"/>
+        <result column="supply_status" property="supplyStatus"/>
+        <result column="shipping_date" property="shippingDate"/>
+        <result column="weight" property="weight"/>
+        <result column="shipping_fee" property="shippingFee"/>
+        <result column="payment_info" property="paymentInfo"/>
+        <result column="payment_status" property="paymentStatus"/>
+        <result column="customer_name" property="customerName"/>
+    </resultMap>
+
+    <resultMap id="WithDetailsResultMap" type="Orders" extends="BaseResultMap">
+        <collection property="details" ofType="OrderDetail"
+                    select="com.example.Sale_Information_System.Mapper.OrderDetailMapper.findByOrderId"
+                    column="order_id"/>
+    </resultMap>
+    <select id="getAllOrders" resultMap="BaseResultMap">
+        SELECT o.*, c.customer_name
+        FROM orders o
+        LEFT JOIN customer c ON o.customer_id = c.customer_id
+        ORDER BY o.order_date DESC
+    </select>
+    <select id="getOrderById" resultMap="WithDetailsResultMap">
+        SELECT o.*, c.customer_name
+        FROM orders o
+        LEFT JOIN customer c ON o.customer_id = c.customer_id
+        WHERE o.order_id = #{orderId}
+    </select>
+    <insert id="insert">
+        INSERT INTO orders (order_id, order_date, customer_id, shipping_requirements, supply_status,
+        shipping_date, weight, shipping_fee, payment_info, payment_status)
+        VALUES (#{orderId}, #{orderDate}, #{customerId}, #{shippingRequirements}, #{supplyStatus},
+        #{shippingDate}, #{weight}, #{shippingFee}, #{paymentInfo}, #{paymentStatus})
+    </insert>
+
+</mapper>

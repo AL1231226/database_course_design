@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import { getProducts } from '@/api/index';
+import api from '@/api/index';
 export default {
   name: 'ProductList',
   data() {
@@ -34,7 +34,7 @@ export default {
   },
   async created() {
     try {
-      this.products = (await getProducts()).data;
+      this.products = (await api.getProducts()).data;
     } catch (e) {
       this.error = '商品加载失败，请稍后重试';
     } finally {

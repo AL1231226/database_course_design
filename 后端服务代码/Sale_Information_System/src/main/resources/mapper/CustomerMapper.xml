@@ -17,4 +17,18 @@
     <select id="getCustomerById" resultMap="BaseResultMap">
         SELECT * FROM customer WHERE customer_id = #{customerId}
     </select>
+    <insert id="insert">
+        INSERT INTO customer (customer_id, customer_name, contact_name, address, zip_code, phone)
+        VALUES (#{customerId}, #{customerName}, #{contactName}, #{address}, #{zipCode}, #{phone})
+    </insert>
+    <update id="update">
+        UPDATE customer
+        SET customer_name = #{customerName}, contact_name = #{contactName}, address = #{address},
+        zip_code = #{zipCode}, phone = #{phone}
+        WHERE customer_id = #{customerId}
+    </update>
+    <delete id="delete">
+        DELETE FROM customer WHERE customer_id = #{customerId}
+    </delete>
+
     </mapper>
