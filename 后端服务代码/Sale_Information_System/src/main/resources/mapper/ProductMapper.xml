@@ -26,5 +26,42 @@
         LEFT JOIN manufacturer m ON p.manufacturer_code = m.manufacturer_code
         WHERE p.product_id = #{productId}
     </select>
+    <insert id="insert">
+        INSERT INTO product (product_id, category_code, manufacturer_code, description, unit_price, stock_quantity)
+        VALUES (#{productId}, #{categoryCode}, #{manufacturerCode}, #{description}, #{unitPrice}, #{stockQuantity})
+    </insert>
+    <update id="update">
+        UPDATE product
+        SET category_code = #{categoryCode}, manufacturer_code = #{manufacturerCode}, description = #{description},
+        unit_price = #{unitPrice}, stock_quantity = #{stockQuantity}
+        WHERE product_id = #{productId}
+    </update>
+    <delete id="delete">
+        DELETE FROM product WHERE product_id = #{productId}
+    </delete>
+
+    <update id="deductStock">
+        UPDATE product SET stock_quantity = stock_quantity - #{quantity}
+        WHERE product_id = #{productId} AND stock_quantity >= #{quantity}
+    </update>
+
+    <select id="getLowStockProducts" resultMap="BaseResultMap">
+        SELECT p.*, m.manufacturer_name
+        FROM product p
+        LEFT JOIN manufacturer m ON p.manufacturer_code = m.manufacturer_code
+        WHERE p.stock_quantity &lt; #{threshold}
+        ORDER BY p.stock_quantity ASC
+    </select>
+
+    <select id="getProductsByCategory" resultMap="BaseResultMap">
+        SELECT p.*, m.manufacturer_name
+        FROM product p
+        LEFT JOIN manufacturer m ON p.manufacturer_code = m.manufacturer_code
+        WHERE p.category_code = #{categoryCode}
+    </select>
+
+    <select id="getAllCategories" resultType="java.lang.String">
+        SELECT DISTINCT category_code FROM product ORDER BY category_code
+    </select>
 
 </mapper>

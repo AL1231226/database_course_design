@@ -28,5 +28,36 @@ public class ProductServiceImpl implements ProductService {
         return productMapper.getProductById(productId);
     }
 
+    @Override
+    public void insert(Product product) {
+        productMapper.insert(product);
+
+    }
+
+    @Override
+    public void update(Product product) {
+        productMapper.update(product);
+
+    }
+
+    @Override
+    public void delete(String productId) {
+        productMapper.delete(productId);
+    }
+
+    @Override
+    public List<Product> getLowStockProducts(Integer threshold) {
+        return productMapper.getLowStockProducts(threshold);
+    }
+
+    @Override
+    public List<Product> getProductsByCategory(String categoryCode) {
+        return productMapper.getProductsByCategory(categoryCode);
+    }
+
+    @Override
+    public List<String> getAllCategories() {
+        return productMapper.getAllCategories();
+    }
 
 }

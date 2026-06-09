@@ -1,16 +1,8 @@
 <template>
-  <div class="product-list">
-    <h2>商品列表</h2>
-
-    <div class="category-bar" v-if="categories.length">
-      <span class="category-label">分类：</span>
-      <button
-        v-for="c in categories"
-        :key="c.code"
-        class="category-btn"
-        @click="$router.push('/customer/products/category/' + c.code)"
-        :title="c.label"
-      >{{ c.label }}</button>
+  <div class="category-page">
+    <div class="page-header">
+      <button class="back-btn" @click="$router.push('/customer/products')">← 返回全部商品</button>
+      <h2>{{ categoryLabel }}（{{ products.length }} 件）</h2>
     </div>
 
     <div v-if="loading" class="loading">加载中...</div>
@@ -24,14 +16,13 @@
             <p class="price">¥{{ p.unitPrice }}</p>
             <p class="meta">厂家：{{ p.manufacturerName }}</p>
             <p class="meta">库存：{{ p.stockQuantity }} 件</p>
-            <p class="meta">分类：{{ p.categoryCode }}</p>
           </div>
           <div class="product-footer">
             <button class="btn" @click="addToCart(p)">加入购物车</button>
           </div>
         </div>
       </div>
-      <div v-if="!products.length" class="empty">暂无商品</div>
+      <div v-if="!products.length" class="empty">该分类暂无商品</div>
     </template>
   </div>
 </template>
@@ -47,20 +38,21 @@ const CATEGORY_MAP = {
   'SPORT-06': '其他'
 };
 export default {
-  name: 'ProductList',
+  name: 'CategoryProducts',
   data() {
-    return { products: [], categories: [], loading: true, error: '' };
+    return { products: [], loading: true, error: '' };
+  },
+  computed: {
+    categoryLabel() {
+      return CATEGORY_MAP[this.$route.params.code] || this.$route.params.code;
+    }
   },
   async created() {
     try {
-      const [prodRes, catRes] = await Promise.all([
-        api.getProducts(),
-        api.getAllCategories()
-      ]);
-      this.products = prodRes.data;
-      this.categories = catRes.data.map(code => ({ code, label: CATEGORY_MAP[code] || code }));
+      const res = await api.getProductsByCategory(this.$route.params.code);
+      this.products = res.data;
     } catch (e) {
-      this.error = '商品加载失败，请稍后重试';
+      this.error = '分类商品加载失败';
     } finally {
       this.loading = false;
     }
@@ -82,11 +74,31 @@ export default {
 </script>
 
 <style scoped>
-.category-bar { margin: 12px 0; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.category-label { font-size: 14px; color: #666; font-weight: 500; }
-.category-btn { padding: 6px 16px; border: 1px solid #d9d9d9; background: #fff; border-radius: 16px; cursor: pointer; font-size: 13px; color: #333; transition: all .2s; }
-.category-btn:hover { border-color: #1890ff; color: #1890ff; background: #e6f7ff; }
-.products { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; margin-top: 12px; }
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.page-header h2 {
+  margin: 0;
+  font-size: 18px;
+}
+.back-btn {
+  padding: 6px 14px;
+  border: 1px solid #d9d9d9;
+  background: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #666;
+  white-space: nowrap;
+}
+.back-btn:hover {
+  color: #1890ff;
+  border-color: #1890ff;
+}
+.products { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
 .product-card { background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,.06); transition: all .3s; display: flex; flex-direction: column; }
 .product-card:hover { transform: translateY(-4px); box-shadow: 0 4px 16px rgba(0,0,0,.12); }
 .product-body { padding: 20px; flex: 1; }

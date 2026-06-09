@@ -10,6 +10,12 @@ public interface OrderMapper {
     List<Orders> getAllOrders();
     Orders getOrderById(String orderId);
     void insert(Orders order);
-
+    List<Orders> getUnpaidOrders();//待付款
+    List<Orders> getUnshippedOrders();//待发货
+    List<Orders> getCompletetedOrders();//已完成
+    void confirmSupply(String orderId);
+    void updatePayment(Orders orders);
+    List<Orders> getCancelledOrders();
+    void cancelOrder(String orderId);
 
 }

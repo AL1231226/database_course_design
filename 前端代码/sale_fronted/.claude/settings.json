@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/刘大乐/Desktop/**)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\刘大乐\\Desktop"
+    ]
+  }
+}

@@ -3,8 +3,10 @@
     <h2>我的订单</h2>
     <div class="tabs">
       <button :class="{ active: tab === 'all' }" @click="tab = 'all'; loadOrders()">全部</button>
+      <button :class="{ active: tab === 'completed' }" @click="tab = 'completed'; loadOrders()">已完成</button>
       <button :class="{ active: tab === 'unpaid' }" @click="tab = 'unpaid'; loadOrders()">未付款</button>
       <button :class="{ active: tab === 'unshipped' }" @click="tab = 'unshipped'; loadOrders()">未发货</button>
+      <button :class="{ active: tab === 'cancelled' }" @click="tab = 'cancelled'; loadOrders()">已取消</button>
     </div>
 
     <div v-if="orders.length">
@@ -14,17 +16,23 @@
           <span class="order-date">{{ o.orderDate }}</span>
           <span :class="'tag tag-' + o.supplyStatus">{{ statusLabel(o.supplyStatus) }}</span>
           <span :class="'tag tag-' + o.paymentStatus">{{ o.paymentStatus === 'paid' ? '已付款' : '未付款' }}</span>
+          <span v-if="o.isCancelled" class="tag tag-cancelled">已取消</span>
         </div>
         <div class="order-body">
           <div class="detail-row" v-for="d in o.details" :key="d.detailId">
             <span>{{ d.productDescription || d.productId }}</span>
+            <span>¥{{ d.unitPrice }}</span>
             <span>×{{ d.quantity }}</span>
             <span>¥{{ d.totalAmount }}</span>
           </div>
         </div>
         <div class="order-footer">
           <span>运费：¥{{ o.shippingFee || '0' }}</span>
-          <span class="total">合计：<strong>¥{{ totalAmount(o) }}</strong></span>
+          <div class="footer-right">
+            <span class="total">合计：<strong>¥{{ totalAmount(o) }}</strong></span>
+            <button v-if="tab !== 'cancelled' && o.paymentStatus === 'unpaid'" class="btn btn-cancel"
+              @click="cancelOrder(o)">取消订单</button>
+          </div>
         </div>
       </div>
     </div>
@@ -41,10 +49,19 @@ export default {
   methods: {
     async loadOrders() {
       try {
+        if (this.tab === 'cancelled') {
+          const res = await api.getCancelledOrders();
+          this.orders = await Promise.all(res.data.map(async o => {
+            const detail = await api.getOrder(o.orderId);
+            return detail.data;
+          }));
+          return;
+        }
         const res = await api.getAllOrders();
         let filtered = res.data;
         if (this.tab === 'unpaid') filtered = filtered.filter(o => o.paymentStatus === 'unpaid');
         else if (this.tab === 'unshipped') filtered = filtered.filter(o => o.supplyStatus === 'pending');
+        else if (this.tab === 'completed') filtered = filtered.filter(o => o.paymentStatus === 'paid');
         this.orders = await Promise.all(filtered.map(async o => {
           const detail = await api.getOrder(o.orderId);
           return detail.data;
@@ -53,10 +70,21 @@ export default {
     },
     totalAmount(o) {
       if (!o.details) return '0.00';
-      return o.details.reduce((s, d) => s + d.totalAmount, 0).toFixed(2);
+      const sub = o.details.reduce((s, d) => s + d.totalAmount, 0);
+      const fee = o.shippingFee || 0;
+      return (sub + fee).toFixed(2);
     },
     statusLabel(s) {
       return { pending: '待确认', available: '可供货', unavailable: '缺货' }[s] || s;
+    },
+    async cancelOrder(o) {
+      if (!confirm(`确定取消订单「${o.orderId}」吗？`)) return;
+      try {
+        await api.cancelOrder(o.orderId);
+        this.loadOrders();
+      } catch (e) {
+        alert('取消失败，请稍后重试');
+      }
     }
   }
 };
@@ -141,13 +169,19 @@ export default {
   color: #d46b08;
 }
 
+.tag-cancelled {
+  background: #f5f5f5;
+  color: #999;
+}
+
 .order-body {
   padding: 12px 20px;
 }
 
 .detail-row {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  gap: 16px;
   padding: 6px 0;
   font-size: 14px;
   border-bottom: 1px dashed #f0f0f0;
@@ -165,6 +199,12 @@ export default {
   align-items: center;
 }
 
+.footer-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .total strong {
   color: #ff4d4f;
   font-size: 18px;
@@ -174,5 +214,22 @@ export default {
   text-align: center;
   color: #999;
   margin-top: 60px;
+}
+
+.btn {
+  padding: 6px 14px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.btn-cancel {
+  background: #ff4d4f;
+  color: #fff;
+}
+
+.btn-cancel:hover {
+  background: #ff7875;
 }
 </style>

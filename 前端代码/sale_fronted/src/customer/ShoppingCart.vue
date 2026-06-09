@@ -50,6 +50,7 @@
         <span class="total">
           合计（{{ itemCount }} 件）：
           <strong>¥{{ total.toFixed(2) }}</strong>
+          <span class="shipping-note">（运费 ¥{{ shippingFee.toFixed(2) }}，应付 <b>¥{{ grandTotal.toFixed(2) }}</b>）</span>
         </span>
         <button class="btn btn-primary btn-lg" @click="showCheckout = true">去结算</button>
       </div>
@@ -99,8 +100,16 @@
               <span>¥{{ (item.unitPrice * item.quantity).toFixed(2) }}</span>
             </div>
             <div class="summary-total">
-              <span>合计</span>
+              <span>合计（商品）</span>
               <span>¥{{ total.toFixed(2) }}</span>
+            </div>
+            <div class="summary-row">
+              <span>运费</span>
+              <span>¥{{ shippingFee.toFixed(2) }}</span>
+            </div>
+            <div class="summary-total">
+              <span>应付总额</span>
+              <span>¥{{ grandTotal.toFixed(2) }}</span>
             </div>
           </div>
         </div>
@@ -135,7 +144,12 @@ export default {
   },
   computed: {
     total() { return this.cart.reduce((s, i) => s + i.unitPrice * i.quantity, 0); },
-    itemCount() { return this.cart.reduce((s, i) => s + i.quantity, 0); }
+    itemCount() { return this.cart.reduce((s, i) => s + i.quantity, 0); },
+    shippingFee() {
+      const qty = this.cart.reduce((s, i) => s + i.quantity, 0);
+      return qty > 5 ? (qty - 5) * 3 : 0;
+    },
+    grandTotal() { return this.total + this.shippingFee; }
   },
   created() {
     this.loadCart();

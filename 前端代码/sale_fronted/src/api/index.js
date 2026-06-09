@@ -26,6 +26,12 @@ export default {
   deleteProduct(id) {
     return api.delete(`/products/${id}`);
   },
+  getProductsByCategory(code) {
+    return api.get(`/products/category/${code}`);
+  },
+  getAllCategories() {
+    return api.get("/products/categories");
+  },
 
   // 客户
   getAllCustomers() {
@@ -77,6 +83,12 @@ export default {
   },
   updatePayment(id, data) {
     return api.put(`/orders/${id}/payment`, data);
+  },
+  cancelOrder(id) {
+    return api.put(`/orders/${id}/cancel`);
+  },
+  getCancelledOrders() {
+    return api.get("/orders/cancelled");
   },
 
   // 厂家

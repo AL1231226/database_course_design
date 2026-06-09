@@ -9,10 +9,15 @@
         <result column="quantity" property="quantity"/>
         <result column="unit_price" property="unitPrice"/>
         <result column="total_amount" property="totalAmount"/>
+        <result column="product_description" property="productDescription"/>
+        <result column="unit_price" property="unitPrice"/>
     </resultMap>
 
     <select id="findByOrderId" resultMap="BaseResultMap">
-        SELECT * FROM order_detail WHERE order_id = #{orderId}
+        SELECT od.*, p.description AS product_description,p.unit_price AS unit_price
+        FROM order_detail od
+        LEFT JOIN product p ON od.product_id = p.product_id
+        WHERE od.order_id = #{orderId}
     </select>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="detailId">

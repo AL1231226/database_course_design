@@ -12,6 +12,8 @@
         <result column="shipping_fee" property="shippingFee"/>
         <result column="payment_info" property="paymentInfo"/>
         <result column="payment_status" property="paymentStatus"/>
+        <result column="is_cancelled" property="isCancelled"/>
+        <result column="total_amount" property="totalAmount"/>
         <result column="customer_name" property="customerName"/>
     </resultMap>
 
@@ -20,23 +22,59 @@
                     select="com.example.Sale_Information_System.Mapper.OrderDetailMapper.findByOrderId"
                     column="order_id"/>
     </resultMap>
-    <select id="getAllOrders" resultMap="BaseResultMap">
-        SELECT o.*, c.customer_name
+
+    <sql id="baseSelect">
+        SELECT o.*, c.customer_name,
+        COALESCE((SELECT SUM(od.total_amount) FROM order_detail od WHERE od.order_id = o.order_id), 0) + COALESCE(o.shipping_fee, 0) AS total_amount
         FROM orders o
         LEFT JOIN customer c ON o.customer_id = c.customer_id
+    </sql>
+
+    <select id="getAllOrders" resultMap="BaseResultMap">
+        <include refid="baseSelect"/>
+        WHERE o.is_cancelled IS NULL OR o.is_cancelled = FALSE
         ORDER BY o.order_date DESC
     </select>
+    <select id="getUnpaidOrders" resultMap="BaseResultMap">
+        <include refid="baseSelect"/>
+        WHERE o.payment_status = 'unpaid' AND (o.is_cancelled IS NULL OR o.is_cancelled = FALSE)
+        ORDER BY o.order_date DESC
+    </select>
+    <select id="getUnshippedOrders" resultMap="BaseResultMap">
+        <include refid="baseSelect"/>
+        WHERE o.supply_status = 'pending' AND (o.is_cancelled IS NULL OR o.is_cancelled = FALSE)
+        ORDER BY o.order_date DESC
+    </select>
+    <select id="getCompletetedOrders" resultMap="BaseResultMap">
+        <include refid="baseSelect"/>
+        WHERE o.payment_status = 'paid' AND (o.is_cancelled IS NULL OR o.is_cancelled = FALSE)
+        ORDER BY o.order_date DESC
+    </select>
+    <select id="getCancelledOrders" resultMap="BaseResultMap">
+        <include refid="baseSelect"/>
+        WHERE o.is_cancelled = TRUE
+        ORDER BY o.order_date DESC
+    </select>
+
     <select id="getOrderById" resultMap="WithDetailsResultMap">
-        SELECT o.*, c.customer_name
-        FROM orders o
-        LEFT JOIN customer c ON o.customer_id = c.customer_id
+        <include refid="baseSelect"/>
         WHERE o.order_id = #{orderId}
     </select>
+    <update id="confirmSupply">
+        UPDATE orders SET supply_status = 'available' WHERE order_id = #{orderId}
+    </update>
+    <update id="updatePayment">
+        UPDATE orders SET payment_status = #{paymentStatus}, payment_info = #{paymentInfo} WHERE order_id = #{orderId}
+    </update>
     <insert id="insert">
         INSERT INTO orders (order_id, order_date, customer_id, shipping_requirements, supply_status,
-        shipping_date, weight, shipping_fee, payment_info, payment_status)
+        shipping_date, weight, shipping_fee, payment_info, payment_status, is_cancelled)
         VALUES (#{orderId}, #{orderDate}, #{customerId}, #{shippingRequirements}, #{supplyStatus},
-        #{shippingDate}, #{weight}, #{shippingFee}, #{paymentInfo}, #{paymentStatus})
+        #{shippingDate}, #{weight}, #{shippingFee}, #{paymentInfo}, #{paymentStatus}, FALSE)
     </insert>
+
+    <update id="cancelOrder">
+        UPDATE orders SET is_cancelled = TRUE WHERE order_id = #{orderId}
+    </update>
 
 </mapper>

@@ -21,6 +21,8 @@ public class Orders {
     private Double shippingFee; //运费
     private String paymentInfo; //付款清单
     private String paymentStatus; //付款状态
+    private Boolean isCancelled; //是否已取消
+    private Double totalAmount; // 总金额（含运费）
 
     private String customerName; // 关联查询
     private List<OrderDetail> details; // 订单明细

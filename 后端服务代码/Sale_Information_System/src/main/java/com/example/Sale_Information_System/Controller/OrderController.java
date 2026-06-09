@@ -27,5 +27,41 @@ public class OrderController {
         orderService.insert(orders);
         return ResponseEntity.ok().build();
     }
+    @RequestMapping("/unpaid")
+    public List<Orders> getUnpaidOrders() {
+        return orderService.getUnpaidOrders();
+    }
+    @RequestMapping("/unshipped")
+    public List<Orders> getUnshippedOrders() {
+        return orderService.getUnshippedOrders();
+    }
+    @RequestMapping("/completed")
+    public List<Orders> getCompletedOrders() {
+        return orderService.getCompletetedOrders() ;
+    }
+
+    @PutMapping("/{id}/confirm")
+    public ResponseEntity<Void> confirmSupply(@PathVariable String id) {
+        orderService.confirmSupply(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}/payment")
+    public ResponseEntity<Void> updatePayment(@PathVariable String id, @RequestBody Orders orders) {
+        orderService.updatePayment(id, orders.getPaymentStatus(), orders.getPaymentInfo());
+        return ResponseEntity.ok().build();
+    }
+
+    @RequestMapping("/cancelled")
+    public List<Orders> getCancelledOrders() {
+        return orderService.getCancelledOrders();
+    }
+
+    @PutMapping("/{id}/cancel")
+    public ResponseEntity<Void> cancelOrder(@PathVariable String id) {
+        orderService.cancelOrder(id);
+        return ResponseEntity.ok().build();
+    }
+
 
 }
