@@ -1,7 +1,14 @@
 {
   "permissions": {
     "allow": [
-      "Read(//c/Users/刘大乐/Desktop/**)"
+      "Read(//c/Users/刘大乐/Desktop/**)",
+      "Bash(pip install *)",
+      "Bash(python)",
+      "Bash(python -c ' *)",
+      "Bash(python -X utf8 fix_toc.py)",
+      "Bash(python -X utf8 fix_headings.py)",
+      "Bash(mysql -u root -p123456 sales_information_system -e \"ALTER TABLE orders ADD COLUMN admin_feedback TEXT COMMENT '管理员发货反馈';\")",
+      "Bash(mysql -u root -p123456 sales_information_system -e \"DESC customer; DESC manufacturer; DESC product; DESC orders; DESC order_detail; DESC admin;\")"
     ],
     "additionalDirectories": [
       "c:\\Users\\刘大乐\\Desktop"

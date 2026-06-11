@@ -12,6 +12,6 @@ public interface ManufacturerMapper {
     void insert(Manufacturer manufacturer);
     void update(Manufacturer manufacturer);
     void delete(String manufacturerCode);
-
+    String getMaxManufacturerCode();
 
 }

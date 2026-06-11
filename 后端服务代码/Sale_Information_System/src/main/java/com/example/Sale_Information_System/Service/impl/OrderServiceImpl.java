@@ -108,4 +108,34 @@ public class OrderServiceImpl implements OrderService {
     public void cancelOrder(String orderId) {
         orderMapper.cancelOrder(orderId);
     }
+
+    @Override
+    public void updateFeedback(String orderId, String adminFeedback) {
+        orderMapper.updateFeedback(orderId, adminFeedback);
+    }
+
+    @Override
+    public List<Orders> getMyOrders(String customerId) {
+        return orderMapper.getMyOrders(customerId);
+    }
+
+    @Override
+    public List<Orders> getMyUnpaidOrders(String customerId) {
+        return orderMapper.getMyUnpaidOrders(customerId);
+    }
+
+    @Override
+    public List<Orders> getMyUnshippedOrders(String customerId) {
+        return orderMapper.getMyUnshippedOrders(customerId);
+    }
+
+    @Override
+    public List<Orders> getMyCompletedOrders(String customerId) {
+        return orderMapper.getMyCompletedOrders(customerId);
+    }
+
+    @Override
+    public List<Orders> getMyCancelledOrders(String customerId) {
+        return orderMapper.getMyCancelledOrders(customerId);
+    }
 }

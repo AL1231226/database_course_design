@@ -27,7 +27,7 @@
         <span class="close" @click="showForm=false">&times;</span>
         <h3>{{ form.customerId ? '编辑' : '新增' }}顾客</h3>
         <div class="form">
-          <div class="form-item"><label>顾客代码</label><input v-model="form.customerId" :disabled="isEditing"></div>
+          <div class="form-item" v-if="isEditing"><label>顾客代码</label><input v-model="form.customerId" disabled></div>
           <div class="form-item"><label>顾客名称</label><input v-model="form.customerName"></div>
           <div class="form-item"><label>联系人</label><input v-model="form.contactName"></div>
           <div class="form-item"><label>地址</label><input v-model="form.address"></div>
@@ -63,9 +63,13 @@ export default {
     },
     async handleDelete(c) {
       if (confirm(`确认删除顾客「${c.customerName}」？`)) {
-        await api.deleteCustomer(c.customerId);
-        const res = await api.getAllCustomers();
-        this.customers = res.data;
+        try {
+          await api.deleteCustomer(c.customerId);
+          const res = await api.getAllCustomers();
+          this.customers = res.data;
+        } catch (e) {
+          alert('删除失败：该顾客可能有关联订单，无法删除');
+        }
       }
     }
   }

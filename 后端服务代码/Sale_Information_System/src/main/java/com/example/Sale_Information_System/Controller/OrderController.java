@@ -2,6 +2,7 @@ package com.example.Sale_Information_System.Controller;
 
 import com.example.Sale_Information_System.Service.OrderService;
 import com.example.Sale_Information_System.pojo.Orders;
+import com.example.Sale_Information_System.util.UserContext;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -61,6 +62,25 @@ public class OrderController {
     public ResponseEntity<Void> cancelOrder(@PathVariable String id) {
         orderService.cancelOrder(id);
         return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}/feedback")
+    public ResponseEntity<Void> updateFeedback(@PathVariable String id, @RequestBody Orders orders) {
+        orderService.updateFeedback(id, orders.getAdminFeedback());
+        return ResponseEntity.ok().build();
+    }
+
+    // 当前顾客的订单（从 JWT 取 userId）
+    @GetMapping("/my")
+    public List<Orders> getMyOrders(@RequestParam(defaultValue = "all") String tab) {
+        String customerId = UserContext.get().userId();
+        return switch (tab) {
+            case "unpaid" -> orderService.getMyUnpaidOrders(customerId);
+            case "unshipped" -> orderService.getMyUnshippedOrders(customerId);
+            case "completed" -> orderService.getMyCompletedOrders(customerId);
+            case "cancelled" -> orderService.getMyCancelledOrders(customerId);
+            default -> orderService.getMyOrders(customerId);
+        };
     }
 
 

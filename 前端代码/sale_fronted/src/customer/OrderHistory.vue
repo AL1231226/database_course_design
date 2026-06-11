@@ -34,6 +34,10 @@
               @click="cancelOrder(o)">取消订单</button>
           </div>
         </div>
+        <div class="order-feedback" v-if="o.adminFeedback">
+          <span class="feedback-label">📦 发货反馈：</span>
+          <span class="feedback-text">{{ o.adminFeedback }}</span>
+        </div>
       </div>
     </div>
     <p v-else class="empty">暂无订单</p>
@@ -49,20 +53,8 @@ export default {
   methods: {
     async loadOrders() {
       try {
-        if (this.tab === 'cancelled') {
-          const res = await api.getCancelledOrders();
-          this.orders = await Promise.all(res.data.map(async o => {
-            const detail = await api.getOrder(o.orderId);
-            return detail.data;
-          }));
-          return;
-        }
-        const res = await api.getAllOrders();
-        let filtered = res.data;
-        if (this.tab === 'unpaid') filtered = filtered.filter(o => o.paymentStatus === 'unpaid');
-        else if (this.tab === 'unshipped') filtered = filtered.filter(o => o.supplyStatus === 'pending');
-        else if (this.tab === 'completed') filtered = filtered.filter(o => o.paymentStatus === 'paid');
-        this.orders = await Promise.all(filtered.map(async o => {
+        const res = await api.getMyOrders(this.tab);
+        this.orders = await Promise.all(res.data.map(async o => {
           const detail = await api.getOrder(o.orderId);
           return detail.data;
         }));
@@ -231,5 +223,22 @@ export default {
 
 .btn-cancel:hover {
   background: #ff7875;
+}
+
+.order-feedback {
+  padding: 10px 20px;
+  border-top: 1px solid #f0f0f0;
+  background: #fffbe6;
+  font-size: 14px;
+}
+
+.feedback-label {
+  font-weight: 600;
+  color: #d48806;
+  margin-right: 8px;
+}
+
+.feedback-text {
+  color: #333;
 }
 </style>

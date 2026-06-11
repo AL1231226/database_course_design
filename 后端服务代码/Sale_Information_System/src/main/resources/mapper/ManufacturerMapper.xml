@@ -29,4 +29,8 @@
     <delete id="delete">
         DELETE FROM manufacturer WHERE manufacturer_code = #{manufacturerCode}
     </delete>
+
+    <select id="getMaxManufacturerCode" resultType="string">
+        SELECT MAX(manufacturer_code) FROM manufacturer WHERE manufacturer_code LIKE 'MFR%'
+    </select>
 </mapper>

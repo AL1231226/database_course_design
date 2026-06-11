@@ -50,6 +50,11 @@
         <p><strong>付款状态：</strong>{{ detail.paymentStatus === 'paid' ? '已付款' : '未付款' }}</p>
         <p><strong>货物重量：</strong>{{ detail.weight || '-' }} kg</p>
         <p><strong>运费：</strong>{{ detail.shippingFee || '-' }} 元</p>
+        <div class="feedback-section">
+          <p><strong>发货反馈：</strong></p>
+          <textarea v-model="feedbackText" rows="3" placeholder="填写预计发货时间、送达时间等信息…"></textarea>
+          <button class="btn btn-info" @click="saveFeedback" :disabled="savingFeedback">{{ savingFeedback ? '保存中…' : '保存反馈' }}</button>
+        </div>
         <h4 style="margin-top:16px">商品明细</h4>
         <table class="table">
           <thead>
@@ -79,7 +84,7 @@
 import api from '@/api/index';
 export default {
   name: 'OrderManage',
-  data() { return { orders: [], tab: 'all', detail: null }; },
+  data() { return { orders: [], tab: 'all', detail: null, feedbackText: '', savingFeedback: false }; },
   created() { this.loadOrders(); },
   methods: {
     async loadOrders() {
@@ -100,6 +105,18 @@ export default {
     async viewDetail(o) {
       const res = await api.getOrder(o.orderId);
       this.detail = res.data;
+      this.feedbackText = res.data.adminFeedback || '';
+    },
+    async saveFeedback() {
+      this.savingFeedback = true;
+      try {
+        await api.updateFeedback(this.detail.orderId, { adminFeedback: this.feedbackText });
+        alert('反馈已保存');
+      } catch (e) {
+        alert('保存失败');
+      } finally {
+        this.savingFeedback = false;
+      }
     },
     totalAmount(o) {
       if (!o.details) return '-';
@@ -250,5 +267,28 @@ export default {
   font-size: 28px;
   cursor: pointer;
   color: #999;
+}
+
+.feedback-section {
+  margin-top: 12px;
+  padding: 12px;
+  background: #fafafa;
+  border-radius: 4px;
+}
+
+.feedback-section textarea {
+  width: 100%;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  padding: 8px;
+  font-size: 13px;
+  resize: vertical;
+  box-sizing: border-box;
+  margin: 4px 0 8px;
+}
+
+.feedback-section textarea:focus {
+  outline: none;
+  border-color: #1890ff;
 }
 </style>

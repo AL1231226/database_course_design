@@ -47,7 +47,7 @@ ALTER TABLE manufacturer MODIFY manufacturer_name VARCHAR(100) NOT NULL UNIQUE;
 -- 4. 订单表
 CREATE TABLE orders (
     order_id             VARCHAR(20)  PRIMARY KEY COMMENT '订单号',
-    order_date           DATE         NOT NULL    COMMENT '下单日期',
+    order_date           DATETIME     NOT NULL    COMMENT '下单时间',
     customer_id          VARCHAR(20)  NOT NULL    COMMENT '顾客代码',
     shipping_requirements VARCHAR(200)            COMMENT '运输要求',
     supply_status        VARCHAR(20)  DEFAULT 'pending' COMMENT '能否供货标志(pending/available/unavailable)',
@@ -57,6 +57,7 @@ CREATE TABLE orders (
     payment_info         VARCHAR(200)             COMMENT '付款信息',
     payment_status       VARCHAR(20)  DEFAULT 'unpaid' COMMENT '付款状态(unpaid/paid)',
     is_cancelled         BOOLEAN      DEFAULT FALSE     COMMENT '是否已取消',
+    admin_feedback       TEXT                           COMMENT '管理员发货反馈',
     FOREIGN KEY (customer_id) REFERENCES customer(customer_id)
 ) COMMENT '订单信息';
 
@@ -109,12 +110,12 @@ INSERT INTO customer VALUES
 
 -- 订单
 INSERT INTO orders VALUES
-('ORD202501001', '2025-01-15', 'CUST001', '标准运输，请轻拿轻放', 'available', '2025-01-18', 15.50, 30.00, '微信支付', 'paid', FALSE),
-('ORD202501002', '2025-01-20', 'CUST002', '加急运输，次日达', 'available', '2025-01-21', 8.20, 50.00, '银行转账', 'paid', FALSE),
-('ORD202502001', '2025-02-10', 'CUST003', '普通运输', 'pending', NULL, 12.00, 25.00, '支付宝', 'unpaid', FALSE),
-('ORD202502002', '2025-02-25', 'CUST004', '周末配送', 'available', '2025-02-28', 20.00, 40.00, '银行转账', 'paid', FALSE),
-('ORD202503001', '2025-03-05', 'CUST005', '含发票，专线运输', 'unavailable', NULL, 5.50, 20.00, '微信支付', 'unpaid', FALSE),
-('ORD202503002', '2025-03-12', 'CUST001', '工作日配送', 'available', '2025-03-15', 30.00, 60.00, '支付宝', 'paid', FALSE);
+('ORD202501001', '2025-01-15', 'CUST001', '标准运输，请轻拿轻放', 'available', '2025-01-18', 15.50, 30.00, '微信支付', 'paid', FALSE, NULL),
+('ORD202501002', '2025-01-20', 'CUST002', '加急运输，次日达', 'available', '2025-01-21', 8.20, 50.00, '银行转账', 'paid', FALSE, NULL),
+('ORD202502001', '2025-02-10', 'CUST003', '普通运输', 'pending', NULL, 12.00, 25.00, '支付宝', 'unpaid', FALSE, NULL),
+('ORD202502002', '2025-02-25', 'CUST004', '周末配送', 'available', '2025-02-28', 20.00, 40.00, '银行转账', 'paid', FALSE, NULL),
+('ORD202503001', '2025-03-05', 'CUST005', '含发票，专线运输', 'unavailable', NULL, 5.50, 20.00, '微信支付', 'unpaid', FALSE, NULL),
+('ORD202503002', '2025-03-12', 'CUST001', '工作日配送', 'available', '2025-03-15', 30.00, 60.00, '支付宝', 'paid', FALSE, NULL);
 
 -- 订单明细
 INSERT INTO order_detail VALUES

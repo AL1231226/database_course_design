@@ -24,7 +24,19 @@ public class ManufacturerServiceimpl implements ManufacturerService {
     }
     @Override
     public void insert(Manufacturer manufacturer) {
+        if (manufacturer.getManufacturerCode() == null || manufacturer.getManufacturerCode().isBlank()) {
+            manufacturer.setManufacturerCode(generateManufacturerCode());
+        }
         manufacturerMapper.insert(manufacturer);
+    }
+
+    private String generateManufacturerCode() {
+        String maxCode = manufacturerMapper.getMaxManufacturerCode();
+        if (maxCode == null) {
+            return "MFR001";
+        }
+        int num = Integer.parseInt(maxCode.replaceAll("\\D", ""));
+        return String.format("MFR%03d", num + 1);
     }
     @Override
     public void update(Manufacturer manufacturer) {

@@ -13,6 +13,7 @@
         <result column="payment_info" property="paymentInfo"/>
         <result column="payment_status" property="paymentStatus"/>
         <result column="is_cancelled" property="isCancelled"/>
+        <result column="admin_feedback" property="adminFeedback"/>
         <result column="total_amount" property="totalAmount"/>
         <result column="customer_name" property="customerName"/>
     </resultMap>
@@ -68,13 +69,44 @@
     </update>
     <insert id="insert">
         INSERT INTO orders (order_id, order_date, customer_id, shipping_requirements, supply_status,
-        shipping_date, weight, shipping_fee, payment_info, payment_status, is_cancelled)
+        shipping_date, weight, shipping_fee, payment_info, payment_status, is_cancelled, admin_feedback)
         VALUES (#{orderId}, #{orderDate}, #{customerId}, #{shippingRequirements}, #{supplyStatus},
-        #{shippingDate}, #{weight}, #{shippingFee}, #{paymentInfo}, #{paymentStatus}, FALSE)
+        #{shippingDate}, #{weight}, #{shippingFee}, #{paymentInfo}, #{paymentStatus}, FALSE, #{adminFeedback})
     </insert>
 
     <update id="cancelOrder">
         UPDATE orders SET is_cancelled = TRUE WHERE order_id = #{orderId}
     </update>
+
+    <update id="updateFeedback">
+        UPDATE orders SET admin_feedback = #{adminFeedback} WHERE order_id = #{orderId}
+    </update>
+
+    <!-- 按顾客查询 -->
+    <select id="getMyOrders" resultMap="BaseResultMap">
+        <include refid="baseSelect"/>
+        WHERE o.customer_id = #{customerId} AND (o.is_cancelled IS NULL OR o.is_cancelled = FALSE)
+        ORDER BY o.order_date DESC
+    </select>
+    <select id="getMyUnpaidOrders" resultMap="BaseResultMap">
+        <include refid="baseSelect"/>
+        WHERE o.customer_id = #{customerId} AND o.payment_status = 'unpaid' AND (o.is_cancelled IS NULL OR o.is_cancelled = FALSE)
+        ORDER BY o.order_date DESC
+    </select>
+    <select id="getMyUnshippedOrders" resultMap="BaseResultMap">
+        <include refid="baseSelect"/>
+        WHERE o.customer_id = #{customerId} AND o.supply_status = 'pending' AND (o.is_cancelled IS NULL OR o.is_cancelled = FALSE)
+        ORDER BY o.order_date DESC
+    </select>
+    <select id="getMyCompletedOrders" resultMap="BaseResultMap">
+        <include refid="baseSelect"/>
+        WHERE o.customer_id = #{customerId} AND o.payment_status = 'paid' AND (o.is_cancelled IS NULL OR o.is_cancelled = FALSE)
+        ORDER BY o.order_date DESC
+    </select>
+    <select id="getMyCancelledOrders" resultMap="BaseResultMap">
+        <include refid="baseSelect"/>
+        WHERE o.customer_id = #{customerId} AND o.is_cancelled = TRUE
+        ORDER BY o.order_date DESC
+    </select>
 
 </mapper>

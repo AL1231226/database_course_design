@@ -1,5 +1,6 @@
 package com.example.Sale_Information_System.pojo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,6 +13,7 @@ import java.util.List;
 
 public class Orders {
     private String orderId; //订单号
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date orderDate; //下单时间
     private String customerId;  //客户代码
     private String shippingRequirements; //配送要求
@@ -22,6 +24,7 @@ public class Orders {
     private String paymentInfo; //付款清单
     private String paymentStatus; //付款状态
     private Boolean isCancelled; //是否已取消
+    private String adminFeedback; //管理员发货反馈
     private Double totalAmount; // 总金额（含运费）
 
     private String customerName; // 关联查询

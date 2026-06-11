@@ -15,4 +15,12 @@ public interface OrderService {
     void updatePayment(String orderId, String paymentStatus, String paymentInfo);
     List<Orders> getCancelledOrders();
     void cancelOrder(String orderId);
+    void updateFeedback(String orderId, String adminFeedback);
+
+    // 当前顾客的订单
+    List<Orders> getMyOrders(String customerId);
+    List<Orders> getMyUnpaidOrders(String customerId);
+    List<Orders> getMyUnshippedOrders(String customerId);
+    List<Orders> getMyCompletedOrders(String customerId);
+    List<Orders> getMyCancelledOrders(String customerId);
 }

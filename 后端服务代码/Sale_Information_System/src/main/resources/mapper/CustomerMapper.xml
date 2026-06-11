@@ -10,6 +10,7 @@
         <result column="address" property="address"/>
         <result column="zip_code" property="zipCode"/>
         <result column="phone" property="phone"/>
+        <result column="password" property="password"/>
     </resultMap>
     <select id="getAllCustomers" resultMap="BaseResultMap">
         SELECT * FROM customer
@@ -18,8 +19,8 @@
         SELECT * FROM customer WHERE customer_id = #{customerId}
     </select>
     <insert id="insert">
-        INSERT INTO customer (customer_id, customer_name, contact_name, address, zip_code, phone)
-        VALUES (#{customerId}, #{customerName}, #{contactName}, #{address}, #{zipCode}, #{phone})
+        INSERT INTO customer (customer_id, customer_name, contact_name, address, zip_code, phone, password)
+        VALUES (#{customerId}, #{customerName}, #{contactName}, #{address}, #{zipCode}, #{phone}, #{password})
     </insert>
     <update id="update">
         UPDATE customer
@@ -30,5 +31,17 @@
     <delete id="delete">
         DELETE FROM customer WHERE customer_id = #{customerId}
     </delete>
+
+    <select id="findByAccount" resultMap="BaseResultMap">
+        SELECT * FROM customer WHERE customer_id = #{account} OR phone = #{account}
+    </select>
+
+    <select id="getMaxCustomerId" resultType="string">
+        SELECT MAX(customer_id) FROM customer WHERE customer_id LIKE 'CUST%'
+    </select>
+
+    <update id="updatePassword">
+        UPDATE customer SET password = #{password} WHERE customer_id = #{customerId}
+    </update>
 
     </mapper>

@@ -64,4 +64,8 @@
         SELECT DISTINCT category_code FROM product ORDER BY category_code
     </select>
 
+    <select id="getMaxProductId" resultType="string">
+        SELECT MAX(product_id) FROM product WHERE product_id LIKE 'P%'
+    </select>
+
 </mapper>

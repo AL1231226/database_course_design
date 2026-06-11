@@ -30,8 +30,20 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void insert(Product product) {
+        if (product.getProductId() == null || product.getProductId().isBlank()) {
+            product.setProductId(generateProductId());
+        }
         productMapper.insert(product);
 
+    }
+
+    private String generateProductId() {
+        String maxId = productMapper.getMaxProductId();
+        if (maxId == null) {
+            return "P001";
+        }
+        int num = Integer.parseInt(maxId.replaceAll("\\D", ""));
+        return String.format("P%03d", num + 1);
     }
 
     @Override

@@ -15,4 +15,5 @@ public class Customer {
     private String address;  //地址
     private String zipCode; //邮编
     private String phone; // 电话
+    private String password; // 密码（BCrypt加密）
 }

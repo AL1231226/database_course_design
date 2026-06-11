@@ -71,15 +71,14 @@
           <span class="close" @click="showCheckout = false">&times;</span>
         </div>
         <div class="modal-body">
-          <div class="form-item" :class="{ invalid: !form.customerId && submitted }">
-            <label>顾客 <span class="required">*</span></label>
-            <select v-model="form.customerId">
-              <option value="" disabled>请选择顾客</option>
-              <option v-for="c in customers" :key="c.customerId" :value="c.customerId">
-                {{ c.customerName }} ({{ c.customerId }})
-              </option>
-            </select>
-            <span class="error-msg" v-if="!form.customerId && submitted">请选择顾客</span>
+          <div class="form-item">
+            <label>顾客</label>
+            <div class="current-user" v-if="user">
+              {{ user.name }}（{{ user.userId }}）
+            </div>
+            <div v-else class="login-hint">
+              请先 <router-link to="/login?redirect=/customer/cart">登录</router-link>
+            </div>
           </div>
           <div class="form-item">
             <label>运输要求</label>
@@ -134,6 +133,7 @@ export default {
     return {
       cart: [],
       customers: [],
+      user: null,
       loading: true,
       error: '',
       showCheckout: false,
@@ -153,9 +153,16 @@ export default {
   },
   created() {
     this.loadCart();
-    this.loadCustomers();
+    this.loadUser();
   },
   methods: {
+    loadUser() {
+      const raw = sessionStorage.getItem('user');
+      if (raw) {
+        this.user = JSON.parse(raw);
+        this.form.customerId = this.user.userId;
+      }
+    },
     loadCart() {
       this.cart = JSON.parse(sessionStorage.getItem('cart') || '[]');
       this.loading = false;
@@ -188,17 +195,19 @@ export default {
     },
     async submitOrder() {
       this.submitted = true;
-      //没选顾客，不提交订单
-      if (!this.form.customerId) return;
+      if (!this.user) return alert('请先登录');
 
       this.submitting = true;
       // 构造订单数据并提交
       try {
-        const orderId = 'ORD' + new Date().toISOString().slice(0, 10).replace(/-/g, '') + String(Date.now()).slice(-4);
+        const now = new Date();
+        const pad = n => String(n).padStart(2, '0');
+        const ymd = `${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}`;
+        const orderId = 'ORD' + ymd + String(now.getTime()).slice(-4);
         const order = {
           orderId,
-          orderDate: new Date().toISOString().slice(0, 10),
-          customerId: this.form.customerId,
+          orderDate: `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`,
+          customerId: this.user.userId,
           shippingRequirements: this.form.shippingRequirements,
           supplyStatus: 'pending',
           paymentInfo: this.form.paymentInfo,
@@ -217,6 +226,7 @@ export default {
         this.submitted = false;
         sessionStorage.removeItem('cart');
         this.cart = [];
+        alert('✅ 订单提交成功！请关注我的订单页查看管理员发货反馈。');
         this.$router.push('/customer/orders');
         //提交失败后显示错误提示
       } catch (e) {
@@ -531,6 +541,24 @@ export default {
 }
 
 /* Form */
+.current-user {
+  padding: 10px 12px;
+  background: #f6ffed;
+  border: 1px solid #b7eb8f;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #52c41a;
+  font-weight: 500;
+}
+.login-hint {
+  padding: 10px 12px;
+  background: #fff7e6;
+  border: 1px solid #ffd591;
+  border-radius: 4px;
+  font-size: 14px;
+}
+.login-hint a { color: #1890ff; text-decoration: none; }
+.login-hint a:hover { text-decoration: underline; }
 .form-item {
   margin-bottom: 16px;
 }

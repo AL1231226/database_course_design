@@ -18,5 +18,6 @@ public interface ProductMapper {
     List<Product> getLowStockProducts(@Param("threshold") Integer threshold);
     List<Product> getProductsByCategory(String categoryCode);
     List<String> getAllCategories();
+    String getMaxProductId();
 
 }

@@ -2,6 +2,7 @@ package com.example.Sale_Information_System.Mapper;
 
 import com.example.Sale_Information_System.pojo.Orders;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -17,5 +18,13 @@ public interface OrderMapper {
     void updatePayment(Orders orders);
     List<Orders> getCancelledOrders();
     void cancelOrder(String orderId);
+    void updateFeedback(@Param("orderId") String orderId, @Param("adminFeedback") String adminFeedback);
+
+    // 按顾客查询
+    List<Orders> getMyOrders(@Param("customerId") String customerId);
+    List<Orders> getMyUnpaidOrders(@Param("customerId") String customerId);
+    List<Orders> getMyUnshippedOrders(@Param("customerId") String customerId);
+    List<Orders> getMyCompletedOrders(@Param("customerId") String customerId);
+    List<Orders> getMyCancelledOrders(@Param("customerId") String customerId);
 
 }

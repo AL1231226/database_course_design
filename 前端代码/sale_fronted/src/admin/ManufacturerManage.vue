@@ -35,8 +35,7 @@
         <span class="close" @click="showForm = false">&times;</span>
         <h3>{{ form.manufacturerCode ? '编辑' : '新增' }}厂家</h3>
         <div class="form">
-          <div class="form-item"><label>厂家代码</label><input v-model="form.manufacturerCode"
-              :disabled="isEditing"></div>
+          <div class="form-item" v-if="isEditing"><label>厂家代码</label><input v-model="form.manufacturerCode" disabled></div>
           <div class="form-item"><label>厂家名称</label><input v-model="form.manufacturerName"></div>
           <div class="form-item"><label>联系人</label><input v-model="form.contactPerson"></div>
           <div class="form-item"><label>联系电话</label><input v-model="form.contactPhone"></div>

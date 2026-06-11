@@ -4,6 +4,11 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
+      path: "/login",
+      name: "login",
+      component: () => import("../Login.vue"),
+    },
+    {
       path: "/",
       redirect: "/customer",
     },
@@ -26,11 +31,13 @@ const router = createRouter({
           path: "cart",
           name: "customer-cart",
           component: () => import("../customer/ShoppingCart.vue"),
+          meta: { requiresAuth: true, role: 'customer' },
         },
         {
           path: "orders",
           name: "customer-orders",
           component: () => import("../customer/OrderHistory.vue"),
+          meta: { requiresAuth: true, role: 'customer' },
         },
       ],
     },
@@ -38,6 +45,7 @@ const router = createRouter({
       path: "/admin",
       component: () => import("../admin/AdminLayout.vue"),
       redirect: "/admin/dashboard",
+      meta: { requiresAuth: true, role: 'admin' },
       children: [
         {
           path: "dashboard",
@@ -67,6 +75,31 @@ const router = createRouter({
       ],
     },
   ],
+});
+
+// 路由守卫
+router.beforeEach((to, from, next) => {
+  const raw = sessionStorage.getItem('user');
+  const user = raw ? JSON.parse(raw) : null;
+
+  // 登录页不拦截
+  if (to.path === '/login') return next();
+
+  // 检查当前路由或其父路由是否要求认证
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+  const requiredRole = to.matched.find(record => record.meta.role)?.meta.role;
+
+  if (requiresAuth) {
+    if (!user) {
+      return next('/login?redirect=' + encodeURIComponent(to.path));
+    }
+    if (requiredRole && user.role !== requiredRole) {
+      if (user.role === 'admin') return next('/admin');
+      return next('/customer');
+    }
+  }
+
+  next();
 });
 
 export default router;

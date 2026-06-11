@@ -39,7 +39,7 @@
         <span class="close" @click="showForm = false">&times;</span>
         <h3>{{ form.productId ? '编辑' : '新增' }}商品</h3>
         <div class="form">
-          <div class="form-item"><label>商品编号</label><input v-model="form.productId" :disabled="isEditing"></div>
+          <div class="form-item" v-if="isEditing"><label>商品编号</label><input v-model="form.productId" disabled></div>
           <div class="form-item"><label>分类编码</label><input v-model="form.categoryCode"></div>
           <div class="form-item"><label>商品说明</label><input v-model="form.description"></div>
           <div class="form-item"><label>单价</label><input type="number" v-model="form.unitPrice"></div>

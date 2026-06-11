@@ -6,7 +6,44 @@ const api = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
+// Axios 请求拦截器：自动带 token
+api.interceptors.request.use((config) => {
+  const raw = sessionStorage.getItem("user");
+  if (raw) {
+    const user = JSON.parse(raw);
+    if (user.token) {
+      config.headers.Authorization = `Bearer ${user.token}`;
+    }
+  }
+  return config;
+});
+
+// Axios 响应拦截器：401 跳登录
+api.interceptors.response.use(
+  (res) => res,
+  (err) => {
+    if (err.response?.status === 401) {
+      sessionStorage.removeItem("user");
+      // 避免在登录页也跳转
+      if (window.location.pathname !== "/login") {
+        window.location.href = "/login";
+      }
+    }
+    return Promise.reject(err);
+  },
+);
+
 export default {
+  // 认证
+  login(data) {
+    return api.post("/auth/login", data);
+  },
+  register(data) {
+    return api.post("/auth/register", data);
+  },
+  changePassword(data) {
+    return api.put("/auth/password", data);
+  },
   // 商品
   getProducts() {
     return api.get("/products");
@@ -89,6 +126,16 @@ export default {
   },
   getCancelledOrders() {
     return api.get("/orders/cancelled");
+  },
+
+  // 当前顾客的订单
+  getMyOrders(tab = "all") {
+    return api.get("/orders/my", { params: { tab } });
+  },
+
+  // 管理员反馈
+  updateFeedback(id, data) {
+    return api.put(`/orders/${id}/feedback`, data);
   },
 
   // 厂家
