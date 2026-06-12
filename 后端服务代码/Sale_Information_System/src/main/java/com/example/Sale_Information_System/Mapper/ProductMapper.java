@@ -15,6 +15,7 @@ public interface ProductMapper {
     void update(Product product);
     void delete(String productId);
     void deductStock(@Param("productId") String productId, @Param("quantity") Integer quantity);
+    void restoreStock(@Param("productId") String productId, @Param("quantity") Integer quantity);
     List<Product> getLowStockProducts(@Param("threshold") Integer threshold);
     List<Product> getProductsByCategory(String categoryCode);
     List<String> getAllCategories();

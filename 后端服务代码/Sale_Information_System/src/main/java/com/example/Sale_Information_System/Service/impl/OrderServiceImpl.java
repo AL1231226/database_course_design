@@ -105,7 +105,18 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public void cancelOrder(String orderId) {
+        // 先检查订单是否已供货，如果是则恢复库存
+        Orders order = orderMapper.getOrderById(orderId);
+        if (order != null && "available".equals(order.getSupplyStatus())) {
+            List<OrderDetail> details = orderDetailMapper.findByOrderId(orderId);
+            if (details != null) {
+                for (OrderDetail detail : details) {
+                    productMapper.restoreStock(detail.getProductId(), detail.getQuantity());
+                }
+            }
+        }
         orderMapper.cancelOrder(orderId);
     }
 
